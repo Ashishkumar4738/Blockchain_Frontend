@@ -1,13 +1,17 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
 import { DeleteIcon } from "./Icons";
+import Loader from "./Loader";
 const Candidate = (props) => {
   const context = useContext(blockchainContext);
+  const [waiting, setWaiting] = useState(false);
   const { candidateList, getAllCandidates, deleteCandidate } = context;
 
   useEffect(() => {
+    setWaiting(true);
     getAllCandidates();
+    setWaiting(false);
     props.handleAlert("Cadidates data fetched from blockchain Successfully","success");
   }, []);
 
@@ -18,6 +22,8 @@ const Candidate = (props) => {
   };
 
   return (
+    <>
+    {waiting && <Loader /> }
     <div className="w-screen h-screen bg-primary">
       <h1 className="text-center text-4xl font-bold pt-6 pb-2 border-blue-50 shadow-2xl mb-6 ">Candidates Details</h1>
       <div className=" flex relative px-40 gap-16 flex-wrap justify-center ">
@@ -36,6 +42,7 @@ const Candidate = (props) => {
           ))}
       </div>
     </div>
+    </>
   );
 };
 

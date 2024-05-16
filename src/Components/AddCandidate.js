@@ -1,6 +1,7 @@
 import React, { useState, useContext,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
+import Loader from "./Loader";
 
 const AddCandidate = (props) => {
   const [name, setName] = useState("");
@@ -8,7 +9,7 @@ const AddCandidate = (props) => {
   const [age, setAge] = useState("0");
   const [partyName, setPartyName] = useState("");
   const [electionType, setElectionType] = useState("");
-
+  const [waiting,setWaiting] = useState(false);
   const navigate = useNavigate();
 
   const context = useContext(blockchainContext);
@@ -24,14 +25,9 @@ const AddCandidate = (props) => {
       
       return;
     }
+    setWaiting(true);
     try {
-      console.log(
-        typeof name,
-        typeof gender,
-        typeof parseInt(age),
-        typeof partyName,
-        typeof electionType
-      );
+      
       await addCandidate(name, gender, parseInt(age), partyName, electionType);
       if(error){
         props.handleAlert(error,"error");
@@ -49,10 +45,12 @@ const AddCandidate = (props) => {
       props.handleAlert(error,"error");
       console.error("Failed to add candidate");
     }
+    setWaiting(false);
   };
 
   return (
     <>
+    {waiting && <Loader /> }
       <div className="bg-primary w-screen h-screen  ">
         <div className="text-4xl font-bold text-center py-6 shadow-2xl">Add Candidate</div>
         <form className="flex flex-col bg-red-100/20 rounded-3xl shadow-inner drop-shadow-2xl backdrop-blur-3xl py-6 mt-10 w-[50%] justify-center items-center gap-4 text-2xl m-auto border-2" onSubmit={handleAddCandidate}>

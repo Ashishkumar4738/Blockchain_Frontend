@@ -1,32 +1,50 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import blockchainContext from "../context/blockchainContext";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const Login = (props) => {
-  const { connectToMetamask, isConnected, votingStatus } =
+  const { connectToMetamask, isConnected, votingStatus, error } =
     useContext(blockchainContext);
   const navigate = useNavigate();
+
+  const [waiting,setWaiting] = useState(false);
 
   useEffect(()=>{
 
   },[connectToMetamask]);
 
+  useEffect(() => {
+    if (error) {
+      props.handleAlert(error, "error");
+      
+    }
+  }, []);
+
   const connect = async () => {
     props.handleAlert("Connecting to MetaMask wallet", "warning");
+    setWaiting(true);
     await connectToMetamask();
-    props.handleAlert("Connected to MetaMask wallet", "success");
-    console.log("login ", isConnected);
-    console.log("voting Status",votingStatus)
+    setWaiting(false);
+    if(error){
+      props.handleAlert(error,"error");
+      navigate("/login");
+    }else{
+      props.handleAlert("Connected to MetaMask wallet", "success");
+    }
+
     if (votingStatus) {
       props.handleAlert("Voting is Live", "warning");
       navigate("/vote");
+    }else{
+      navigate("/");
     }
-    navigate("/");
   };
 
   // Render a button to initiate connection
   return (
     <>
+    {waiting && <Loader /> }
       <div className=" flex flex-col relative w-full h-screen z-10 bg-primary  justify-center items-center gap-2">
         <img src="./images/bg.webp" alt="" className="absolute -z-10 w-screen h-screen opacity-50  " />
         <h1 className="font-bold text-4xl mb-8 drop-shadow-lg shadow-black  ">

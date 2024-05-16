@@ -29,6 +29,11 @@ input{
 
 }
 
+.customfile::-webkit-file-upload-button{
+  background-color: transparent;
+  cursor: pointer;
+}
+
 
 
 code {

@@ -69,12 +69,14 @@ const AadharDetailsPage = (props) => {
                   isImageField(key) ? (
                     <div key={index}>
                       {key === "profile" && (
+                        <>
                         <img
                           width={"10%"}
-                          src={`http://localhost:5000/${value}`}
+                          src={`http://localhost:8080/${value}`}
                           alt={key}
                           className="rounded-lg absolute left-5  -top-10 w-[18%] h-auto shadow-white/40 shadow-xl "
                         />
+                        </>
                       )}
                     </div>
                   ) : (

@@ -101,25 +101,25 @@ const Home = (props) => {
         <div className="modal z-50 overflow-hidden absolute left-[25%] top-[20%] rounded-2xl backdrop-blur-md h-1/2  w-1/2 shadow-white shadow-inner ">
           <div className="modal-content flex flex-col w-full h-full justify-center items-center ">
             <div
-              className="text-3xl absolute top-10 right-10 font-semibold cursor-pointer "
+              className="text-3xl absolute top-10 right-5 font-semibold cursor-pointer hover:border-green-500  border-black border-2  text-center px-2 py-1 pb-3 rounded-full shadow-black hover:shadow-green-500 hover:text-green-600 shadow-inner drop-shadow-2xl "
               onClick={() => {
                 setShowModal(false);
               }}
             >
               x
             </div>
-            <h1 className="text-xl text-black font-bold  ">
+            <h1 className="text-2xl text-black font-bold  ">
               {" "}
               <span className="text-red-600 text-2xl font-bold  ">
                 Warning:-{" "}
               </span>{" "}
               Once start you will not able to modify things.{" "}
             </h1>
-            <h2 className="text-xl mt-6 font-semibold ">
+            <h2 className="text-2xl mt-6 font-semibold ">
               Enter the duration of Voting in Minutes{" "}
             </h2>
             <input
-              className="bg-transparent text-center text-xl font-bold mt-3 border-b-4 border-black "
+              className="bg-transparent text-center text-2xl text-green-600 font-bold mt-3 border-b-4 border-black "
               type="number"
               value={time1}
               onChange={(e) => setTime(parseInt(e.target.value))}

@@ -1,8 +1,10 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
-
+import Loader from "./Loader";
 const VoteCasting = (props) => {
+  const [waiting,setWaiting] = useState(false);
+
   const context = useContext(blockchainContext);
   const {
     candidateList,
@@ -14,7 +16,9 @@ const VoteCasting = (props) => {
   } = context;
   const navigate = useNavigate();
   useEffect(() => {
+    setWaiting(true);
     getAllCandidates();
+    setWaiting(false);
   }, []);
 
   
@@ -26,9 +30,10 @@ const VoteCasting = (props) => {
   const performVote = async (index) => {
     // console.log("aadhar no.",,"index",)
     props.handleAlert("Your voting is validating in Blockchain", "warning");
+    setWaiting(true);
     await castVote(aadharDetails.uniqueNumber, index + 1);
+    setWaiting(false);
     
-     updateError();
     if (error) {
       props.handleAlert(error, "error");
       navigate("/");
@@ -38,6 +43,9 @@ const VoteCasting = (props) => {
   };
 
   return (
+
+    <>
+    {waiting && <Loader />}
     <div className="w-screen h-screen bg-primary">
       <h1 className="text-center text-4xl font-bold py-3 shadow-2xl">
         Candidates List
@@ -62,6 +70,7 @@ const VoteCasting = (props) => {
           ))}
       </div>
     </div>
+    </>
   );
 };
 
