@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -6,6 +10,26 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+button{
+  border:2px solid black;
+  border-radius: 20px;
+  padding: 5px 5px;
+}
+label{
+  font-weight: 700;
+}
+input:focus {
+  outline: none;
+}
+
+input{
+  background : transparent;
+  font-weight: 700;
+
+}
+
+
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
