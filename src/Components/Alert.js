@@ -1,7 +1,6 @@
 import React from "react";
 
 function Alert(props) {
-    console.log(props)
   function toUpper() {
     let type = props.alert.type;
     if(props.alert.type==="danger"){

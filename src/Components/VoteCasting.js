@@ -33,6 +33,7 @@ const VoteCasting = (props) => {
     setWaiting(true);
     await castVote(aadharDetails.uniqueNumber, index + 1);
     setWaiting(false);
+    props.handleAlert("Your vote recorded successfully","success");
     
     if (error) {
       props.handleAlert(error, "error");

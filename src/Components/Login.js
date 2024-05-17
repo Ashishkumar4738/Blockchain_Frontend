@@ -4,39 +4,42 @@ import { useNavigate } from "react-router-dom";
 import Loader from "./Loader";
 
 const Login = (props) => {
-  const { connectToMetamask, isConnected, votingStatus, error } =
+  const { connectToMetamask, votingStatus,getCurrentStatus, error,votingEndTime } =
     useContext(blockchainContext);
   const navigate = useNavigate();
 
   const [waiting,setWaiting] = useState(false);
-
   useEffect(()=>{
-
+    votingEndTime();
   },[connectToMetamask]);
 
   useEffect(() => {
+    getCurrentStatus();
     if (error) {
       props.handleAlert(error, "error");
-      
     }
   }, []);
 
   const connect = async () => {
     props.handleAlert("Connecting to MetaMask wallet", "warning");
     setWaiting(true);
-    await connectToMetamask();
+    await connectToMetamask().then(()=>{
+      getCurrentStatus();
+    });
     setWaiting(false);
     if(error){
       props.handleAlert(error,"error");
+      
       navigate("/login");
     }else{
       props.handleAlert("Connected to MetaMask wallet", "success");
     }
 
-    if (votingStatus) {
+    if ( votingStatus) {
       props.handleAlert("Voting is Live", "warning");
       navigate("/vote");
     }else{
+      console.log("voting status in lging", votingStatus)
       navigate("/");
     }
   };
@@ -47,7 +50,7 @@ const Login = (props) => {
     {waiting && <Loader /> }
       <div className=" flex flex-col relative w-full h-screen z-10 bg-primary  justify-center items-center gap-2">
         <img src="./images/bg.webp" alt="" className="absolute -z-10 w-screen h-screen opacity-50  " />
-        <h1 className="font-bold text-4xl mb-8 drop-shadow-lg shadow-black  ">
+        <h1 className="font-bold text-4xl mb-8 drop-shadow-lg shadow-black text-center ">
           Welcome to Blockchain Based Voting System
         </h1>
       <div className="z-50 relative" >

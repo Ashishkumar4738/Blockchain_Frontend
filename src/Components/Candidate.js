@@ -17,8 +17,10 @@ const Candidate = (props) => {
 
     
 
-  const deleteCan = (index) => {
-    deleteCandidate(index);
+  const deleteCan = async (index) => {
+    setWaiting(true);
+    await deleteCandidate(index+1);
+    setWaiting(false);
   };
 
   return (
@@ -36,6 +38,7 @@ const Candidate = (props) => {
               <p>Age: {candidate[2].toString()}</p>
               <p>Party Name: {candidate[3]}</p>
               <p>Election Type: {candidate[4]}</p>
+              <p>TotalVotes Count: {candidate[5].toString()}</p>
               {/* Add buttons or links for actions like getByIndex and deleteCan */}
               <button onClick={() => deleteCan(index)} className="drop-shadow-xl shadow-white absolute right-0 top-0 border-transparent float-right " > <p className="absolute text-xs top-10 hover:visible hidden  " >Delete this Candidate</p> <DeleteIcon /> </button>
             </div>

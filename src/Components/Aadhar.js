@@ -16,6 +16,8 @@ const Aadhar = (props) => {
     occupation: "",
     education: "",
     maritalStatus: "",
+    profile: null,
+    fingerprint: null,
   });
 
   const navigate = useNavigate();
@@ -28,10 +30,10 @@ const Aadhar = (props) => {
     setUserData({ ...userData, [name]: value });
   };
 
-  const handleImagePreview = (e, setImagePreview) => {
+  const handleImagePreview = (e, setImagePreview, imageField) => {
     const file = e.target.files[0];
+    setUserData({ ...userData, [imageField]: file });
 
-    // Display image preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -39,7 +41,6 @@ const Aadhar = (props) => {
     if (file) {
       reader.readAsDataURL(file);
     }
-    return file;
   };
 
   const handleSubmit = async (e) => {
@@ -53,7 +54,7 @@ const Aadhar = (props) => {
 
       // Send user data to backend
       const response = await axios.post(
-        "http://localhost:5000/aadhar/addAadhar",
+        "http://localhost:8080/aadhar/addAadhar",
         formData,
         {
           headers: {
@@ -75,22 +76,21 @@ const Aadhar = (props) => {
     <>
       {waiting && <Loader />}
       <div className="w-screen h-screen bg-primary flex items-center">
-        
         {profilePreview && (
-          <div className="w-1/3 ml-3 flex flex-col  justify-center items-center gap-6 ">
-            <h1 className="text-center font-semibold text-2xl underline underline-offset-4  ">
+          <div className="w-1/3 ml-3 flex flex-col justify-center items-center gap-6">
+            <h1 className="text-center font-semibold text-2xl underline underline-offset-4">
               Profile Preview
             </h1>
-            <img src={profilePreview} alt="Profile Preview"  className=" w-[50%] h-[50%]" />
+            <img src={profilePreview} alt="Profile Preview" className="w-[50%] h-[50%]" />
           </div>
         )}
-          
+
         <form
           onSubmit={handleSubmit}
           className="border-2 border-transparent px-5 py-1 m-auto shadow-2xl backdrop-blur-3xl rounded-3xl"
         >
           <div className="flex flex-col gap-4">
-            <label className="text-xl font-semibold underline underline-offset-2 ">Personal Information:</label>
+            <label className="text-xl font-semibold underline underline-offset-2">Personal Information:</label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label>Name:</label>
@@ -108,7 +108,7 @@ const Aadhar = (props) => {
                   name="gender"
                   value={userData.gender}
                   onChange={handleChange}
-                  className="border-b-2 border-black text-center bg-transparent "
+                  className="border-b-2 border-black text-center bg-transparent"
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
@@ -193,7 +193,7 @@ const Aadhar = (props) => {
                 name="maritalStatus"
                 value={userData.maritalStatus}
                 onChange={handleChange}
-                className="border-b-2 border-black text-center bg-transparent "
+                className="border-b-2 border-black text-center bg-transparent"
               >
                 <option value="">Select Marital Status</option>
                 <option value="single">Single</option>
@@ -210,7 +210,7 @@ const Aadhar = (props) => {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => handleImagePreview(e, setProfilePreview)}
+              onChange={(e) => handleImagePreview(e, setProfilePreview, 'profile')}
               className="customfile"
             />
           </div>
@@ -221,7 +221,7 @@ const Aadhar = (props) => {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => handleImagePreview(e, setFingerprintPreview)}
+              onChange={(e) => handleImagePreview(e, setFingerprintPreview, 'fingerprint')}
               className="customfile"
             />
           </div>
@@ -236,11 +236,11 @@ const Aadhar = (props) => {
 
         {/* Fingerprint Image Preview */}
         {fingerprintPreview && (
-          <div className="w-1/3 mr-3 flex flex-col items-center justify-center gap-6 ">
+          <div className="w-1/3 mr-3 flex flex-col items-center justify-center gap-6">
             <h1 className="text-center font-semibold text-2xl underline underline-offset-4">
               Fingerprint Preview
             </h1>
-            <img src={fingerprintPreview} alt="Fingerprint Preview"  className="w-[50%] h-[50%] " />
+            <img src={fingerprintPreview} alt="Fingerprint Preview" className="w-[50%] h-[50%]" />
           </div>
         )}
       </div>

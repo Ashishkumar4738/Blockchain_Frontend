@@ -10,11 +10,11 @@ import VoteCasting from "./Components/VoteCasting";
 import Aadhar from "./Components/Aadhar";
 import AadharDetailsPage from "./Components/AadharDetailsPage";
 import Alert from "./Components/Alert";
+import Result from "./Components/Result";
 function App() {
   const [alert, setAlert] = useState(null);
 
   const handleAlert = (message, type) => {
-    console.log("handle alert",message);
     setAlert(() => {
       return {
         message,
@@ -53,6 +53,10 @@ function App() {
             <Route
               path="/aadhar"
               element={<Aadhar handleAlert={handleAlert} />}
+            />
+            <Route
+              path="/result"
+              element={<Result handleAlert={handleAlert} />}
             />
             <Route
               path="/aadhar-details"

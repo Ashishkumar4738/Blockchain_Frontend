@@ -4,7 +4,8 @@ import blockchainContext from "../context/blockchainContext";
 
 const AadharDetailsPage = (props) => {
   const context = useContext(blockchainContext);
-  const { aadharDetails,time, remainingTime, updateCountdown} = context;
+  const { aadharDetails, time, remainingTime, votingEndTime, updateCountdown } =
+    context;
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
 
@@ -24,9 +25,9 @@ const AadharDetailsPage = (props) => {
     }
   }, [aadharDetails]);
 
-  useEffect(()=>{
-    updateCountdown(time);
-  })
+  useEffect(() => {
+    votingEndTime();
+  });
 
   // Function to calculate age and update the show state
   const calculateAge = (dob) => {
@@ -70,12 +71,12 @@ const AadharDetailsPage = (props) => {
                     <div key={index}>
                       {key === "profile" && (
                         <>
-                        <img
-                          width={"10%"}
-                          src={`http://localhost:8080/${value}`}
-                          alt={key}
-                          className="rounded-lg absolute left-5  -top-10 w-[18%] h-auto shadow-white/40 shadow-xl "
-                        />
+                          <img
+                            width={"10%"}
+                            src={`http://localhost:8080/${value}`}
+                            alt={key}
+                            className="rounded-lg absolute left-5  -top-10 w-[18%] h-auto shadow-white/40 shadow-xl "
+                          />
                         </>
                       )}
                     </div>

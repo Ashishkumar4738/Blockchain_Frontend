@@ -3,27 +3,28 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
 import Loader from "./Loader";
+
 const Vote = (props) => {
   const [adharNo, setAdharNo] = useState(0);
-  const [userFingerprint, setUserFingerprint] = useState(null); // State for user's uploaded fingerprint
-  const [aadhar, setAadhar] = useState(null); // State for Aadhar details
-  const [waiting,setWaiting] = useState(false);
+  const [userFingerprint, setUserFingerprint] = useState(null);
+  const [aadhar, setAadhar] = useState(null);
+  const [waiting, setWaiting] = useState(false);
+  const [showFinger, setShowFinger] = useState(false);
   const navigate = useNavigate();
 
   const context = useContext(blockchainContext);
   const {
+    votingStatus,
     setAadharDetails,
     verifyVoter,
-    voter,
     error,
-    time,
     remainingTime,
-    updateCountdown,
+    votingEndTime
   } = context;
 
   useEffect(() => {
-    updateCountdown(time);
-  }, [time]);
+    votingEndTime();
+  });
 
   useEffect(() => {
     if (error) {
@@ -33,22 +34,28 @@ const Vote = (props) => {
 
   const verify = async () => {
     setWaiting(true);
-    await verifyVoter(adharNo);
-    console.log("voter status", adharNo);
+    const check = await verifyVoter(adharNo);
+    
     setWaiting(false);
-    if (!voter[0]) {
+    if (!check) {
       matchAdharCard();
     } else {
       props.handleAlert("You have already voted.", "error");
     }
   };
 
+  
+    if (votingStatus && remainingTime <= 0) {
+      navigate("/result");
+    }
+
+
   const handleFingerprintUpload = (event) => {
     setUserFingerprint(event.target.files[0]);
   };
 
   const matchFingerprints = async () => {
-    setWaiting(true);
+    setShowFinger(true);
     try {
       const response = await fetch(
         `http://localhost:8080/${aadhar.fingerprint}`
@@ -68,22 +75,24 @@ const Vote = (props) => {
         "http://localhost:5000/compare_fingerprints",
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      setWaiting(false);
+      console.log("data score", result.data.match_score);
 
-      console.log("Fingerprint match result:", result.data);
-      // Handle the result as needed
       if (result.data.match_score > 75) {
         props.handleAlert("Fingerprint matched successfully.", "success");
-        navigate("/aadhar-details");
+
+        setTimeout(() => {
+          setShowFinger(false);
+          navigate("/aadhar-details");
+        }, 2500);
       } else {
+        setShowFinger(false);
         props.handleAlert("Fingerprint does not match.", "error");
       }
     } catch (error) {
+      setShowFinger(false);
       props.handleAlert(error.message, "error");
       console.error("Error when matching fingerprint", error);
     }
@@ -107,61 +116,61 @@ const Vote = (props) => {
 
   return (
     <>
-      { waiting &&  <Loader /> }
+      {waiting && <Loader />}
       <div className="flex flex-col pt-20 items-center h-screen w-screen bg-primary text-2xl font-semibold">
         <div className="self-top bg-primaryDark px-4 py-2 rounded-full shadow-2xl">
           Remaining Time :- {remainingTime}
         </div>
 
-        {!aadhar && (
-          <>
-            <div className="-mt-24 flex items-center justify-center h-screen w-screen">
-              <div className="flex flex-col items-center gap-5 rounded-3xl px-6 py-14 shadow-2xl drop-shadow-2xl backdrop-blur-3xl">
-                <h1 className="font-bold text-3xl drop-shadow-2xl">
-                  Enter Aadhar no.
-                </h1>
-                <input
-                  className="text-center bg-transparent border-b-2 border-black"
-                  type="number"
-                  name="adharNo"
-                  value={adharNo}
-                  onChange={(e) => setAdharNo(e.target.value)}
-                />
-                <button
-                  onClick={verify}
-                  className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500"
-                >
-                  Get Aadhar card
-                </button>
-              </div>
+        {!aadhar ? (
+          <div className="-mt-24 flex items-center justify-center h-screen w-screen">
+            <div className="flex flex-col items-center gap-5 rounded-3xl px-6 py-14 shadow-2xl drop-shadow-2xl backdrop-blur-3xl">
+              <h1 className="font-bold text-3xl drop-shadow-2xl">
+                Enter Aadhar no.
+              </h1>
+              <input
+                className="text-center bg-transparent border-b-2 border-black"
+                type="number"
+                name="adharNo"
+                value={adharNo}
+                onChange={(e) => setAdharNo(e.target.value)}
+              />
+              <button
+                onClick={verify}
+                className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500"
+              >
+                Get Aadhar card
+              </button>
             </div>
-          </>
-        )}
+          </div>
+        ) : (
+          <div className="-mt-24 flex items-center justify-center h-screen w-screen">
+            {showFinger && (
+              <img
+                src="./images/finger.gif"
+                alt=""
+                className="w-[50%] h-[50%] z-40 absolute mix-blend-color-burn backdrop-blur-sm "
+              />
+            )}
 
-       
-
-        {aadhar && (
-          <>
-            <div className="-mt-24 flex items-center justify-center h-screen w-screen">
-              <div className="flex flex-col items-center gap-5 rounded-3xl px-6 py-14 shadow-2xl drop-shadow-2xl backdrop-blur-3xl">
-                <h1 className="font-bold text-3xl drop-shadow-2xl  ">
-                  Now upload your fingerprint
-                </h1>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFingerprintUpload}
-                  className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500 w-[80%] rounded-full "
-                />
-                <button
-                  onClick={matchFingerprints}
-                  className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500"
-                >
-                  Match Fingerprints
-                </button>
-              </div>
+            <div className="flex flex-col items-center gap-5 rounded-3xl px-6 py-14 shadow-2xl drop-shadow-2xl backdrop-blur-3xl">
+              <h1 className="font-bold text-3xl drop-shadow-2xl">
+                Now upload your fingerprint
+              </h1>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFingerprintUpload}
+                className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500 w-[80%] rounded-full"
+              />
+              <button
+                onClick={matchFingerprints}
+                className="font-bold text-xl hover:border-green-500 shadow-2xl bg-green-100/40 px-4 py-2 hover:text-green-500"
+              >
+                Match Fingerprints
+              </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </>

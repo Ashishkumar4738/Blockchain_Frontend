@@ -19,8 +19,11 @@ function BlockchainState(props) {
 
   useEffect(() => {
     
-    getCurrentStatus();
-  }, [provider]); // Run only when provider changes
+    getCurrentStatus().then(()=>{
+      votingEndTime();
+    });
+
+  },[provider]); // Run only when provider changes
 
 
 
@@ -30,6 +33,7 @@ function BlockchainState(props) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
         setProvider(provider);
+        getCurrentStatus();
         setAccount(accounts[0]);
         setIsConnected(true);
         console.log("MetaMask connected:", accounts[0]);
@@ -55,6 +59,7 @@ function BlockchainState(props) {
       );
       const status = await contractInstance.votingStarted();
       setVotingStatus(status);
+      return status;
     } catch (error) {
       setError(error.error.message);
       console.error("Error fetching current status:", error);
@@ -131,7 +136,9 @@ function BlockchainState(props) {
       );
       const time = await contractInstance.votingEndTime();
       setTime(parseInt(time._hex));
-      console.log("from state time",parseInt(time._hex))
+      updateCountdown(parseInt(time._hex));
+      console.log("time from blockchian ",parseInt(time._hex))
+      
     } catch (error) {
       setError(error.error.message);
       console.error("Error fetching current status:", error);
@@ -140,14 +147,13 @@ function BlockchainState(props) {
 
   function updateCountdown(endTime) {
     const now = Math.floor(Date.now() / 1000);
-    const timeLeft = 1715849714 - now;
-    console.log("state",endTime)
+    const timeLeft = endTime - now;
     if (timeLeft <= 0) {
       setRemainingTime(0);
     } else {
       setRemainingTime(timeLeft);
     }
-    console.log("from state",timeLeft)
+    console.log("timeleft in seconds remaining time ", timeLeft)
   }
 
   async function verifyVoter(adharCard) {
@@ -161,6 +167,7 @@ function BlockchainState(props) {
       );
       const voter = await contractInstance.voters(adharCard);
       setVoter(voter);
+      console.log("voter in verify voter",voter);
       return voter;
     } catch (error) {
       setError(error.message)
@@ -198,7 +205,7 @@ function BlockchainState(props) {
       );
       const txn = await contractInstance.startVoting(time);
       await txn.wait();
-      
+      setVotingStatus(true);
       console.log("voting has started");
     } catch (error) {
       setError(error.error.message)

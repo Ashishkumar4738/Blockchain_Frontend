@@ -40,7 +40,7 @@ const AddCandidate = (props) => {
       setPartyName("");
       setElectionType("");
       props.handleAlert("Candidate added successfully","success");
-      navigate("/"); // Redirect to candidates page after successful addition
+      navigate("/candidates"); // Redirect to candidates page after successful addition
     } catch (error) {
       props.handleAlert(error,"error");
       console.error("Failed to add candidate");
