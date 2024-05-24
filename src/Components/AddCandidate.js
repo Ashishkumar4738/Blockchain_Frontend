@@ -1,4 +1,4 @@
-import React, { useState, useContext,useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
 import Loader from "./Loader";
@@ -9,51 +9,60 @@ const AddCandidate = (props) => {
   const [age, setAge] = useState("0");
   const [partyName, setPartyName] = useState("");
   const [electionType, setElectionType] = useState("");
-  const [waiting,setWaiting] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  const [candidateAdded, setCandidateAdded] = useState(false); // Track if candidate is added successfully
   const navigate = useNavigate();
 
   const context = useContext(blockchainContext);
-  const { addCandidate,error } = context;
+  const { addCandidate, error } = context;
 
-  useEffect(()=>{
+  useEffect(() => {
+    if (candidateAdded) {
+      if (error) {
+        props.handleAlert(error, "error");
+        navigate("/");
+      } else {
+        // Clear form fields after successful submission
+        setName("");
+        setGender("");
+        setAge("");
+        setPartyName("");
+        setElectionType("");
+        props.handleAlert("Candidate added successfully", "success");
+        navigate("/candidates");
+      }
+      setWaiting(false);
+    }
+  }, [error, candidateAdded, navigate, props]);
 
-  },[addCandidate]);
   const handleAddCandidate = async (e) => {
     e.preventDefault();
     if (!name || !gender || !age || !partyName || !electionType) {
-      props.handleAlert("All fields are required","warning");
-      
+      props.handleAlert("All fields are required", "warning");
       return;
     }
     setWaiting(true);
     try {
-      
       await addCandidate(name, gender, parseInt(age), partyName, electionType);
-      if(error){
-        props.handleAlert(error,"error");
-
-      }
-      // Clear form fields after successful submission
-      setName("");
-      setGender("");
-      setAge("");
-      setPartyName("");
-      setElectionType("");
-      props.handleAlert("Candidate added successfully","success");
-      navigate("/candidates"); // Redirect to candidates page after successful addition
+      setCandidateAdded(true);
     } catch (error) {
-      props.handleAlert(error,"error");
-      console.error("Failed to add candidate");
+      props.handleAlert(error.message || "Failed to add candidate", "error");
+      console.error("Failed to add candidate:", error);
+      setWaiting(false);
     }
-    setWaiting(false);
   };
 
   return (
     <>
-    {waiting && <Loader /> }
+      {waiting && <Loader />}
       <div className="bg-primary w-screen h-screen  ">
-        <div className="text-4xl font-bold text-center py-6 shadow-2xl">Add Candidate</div>
-        <form className="flex flex-col bg-red-100/20 rounded-3xl shadow-inner drop-shadow-2xl backdrop-blur-3xl py-6 mt-10 w-[50%] justify-center items-center gap-4 text-2xl m-auto border-2" onSubmit={handleAddCandidate}>
+        <div className="text-4xl font-bold text-center py-6 shadow-2xl">
+          Add Candidate
+        </div>
+        <form
+          className="flex flex-col bg-red-100/20 rounded-3xl shadow-inner drop-shadow-2xl backdrop-blur-3xl py-6 mt-10 w-[50%] justify-center items-center gap-4 text-2xl m-auto border-2"
+          onSubmit={handleAddCandidate}
+        >
           <div>
             <label htmlFor="name">Name:</label>
             <input
@@ -65,7 +74,7 @@ const AddCandidate = (props) => {
             />
           </div>
           <div>
-            <label htmlFor="gender" >Gender:</label>
+            <label htmlFor="gender">Gender:</label>
             <input
               id="gender"
               type="text"
@@ -104,8 +113,13 @@ const AddCandidate = (props) => {
               className="bg-transparent ml-10 border-b-2 border-black rotated-input"
             />
           </div>
-          
-          <button type="submit" className="font-semibold px-6 py-3 bg-primaryDark/80 border-4 mt-6 drop-shadow-2xl  " >Add Candidate</button>
+
+          <button
+            type="submit"
+            className="font-semibold px-6 py-3 bg-primaryDark/80 border-4 mt-6 drop-shadow-2xl  "
+          >
+            Add Candidate
+          </button>
         </form>
       </div>
     </>
