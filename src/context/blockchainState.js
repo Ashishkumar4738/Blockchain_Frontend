@@ -189,7 +189,7 @@ function BlockchainState(props) {
       console.log(deletedCandidate);
       console.log("candidate Deleted Successfully");
     } catch (error) {
-      setError(error.message)
+      setError(error.error.message)
       console.error("Error fetching current voter status:", error);
     }
   }

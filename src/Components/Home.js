@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
-
 import { EthereumIcon, MetamaskLogo, QrCode } from "./Icons";
 import Loader from "./Loader";
 
 const Home = (props) => {
   const [time1, setTime] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [waiting,setWaiting] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  const [votingStarted, setVotingStarted] = useState(false); // Track if voting has started
   const context = useContext(blockchainContext);
   const {
     error,
@@ -17,18 +17,15 @@ const Home = (props) => {
     account,
     setAccount,
     setIsConnected,
-    time,
     votingEndTime,
     startVoting,
     getAllCandidates,
-    updateCountdown
   } = context;
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     votingEndTime();
-  },[])
-
+  }, [votingEndTime]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -48,14 +45,26 @@ const Home = (props) => {
   }, [isConnected, navigate, props]);
 
   useEffect(() => {
-    getVotingEndTime();
     if (votingStatus) {
+      getVotingEndTime();
       props.handleAlert("Voting is Live", "warning");
       navigate("/vote");
     }
-  }, [startVoting]);
+  }, [startVoting, votingStatus]);
 
-  useEffect(() => {}, [setShowModal]);
+  useEffect(() => {
+    if (votingStarted) {
+      if (error) {
+        props.handleAlert(error, "error");
+        setShowModal(false);
+        navigate("/login");
+      } else {
+        props.handleAlert("Voting has started successfully", "success");
+        navigate("/vote");
+      }
+      setWaiting(false);
+    }
+  }, [startVoting, votingStarted]);
 
   const handleAccountsChanged = (accounts) => {
     if (accounts.length > 0 && accounts[0] !== account) {
@@ -72,33 +81,16 @@ const Home = (props) => {
   };
 
   const start = () => {
-    
     setShowModal(true);
     props.handleAlert("You are going to start voting", "warning");
-
     getAllCandidates();
   };
 
   const handleStart = async () => {
-    // Call the start function with the specified time
     setWaiting(true);
     await startVoting(time1 * 60);
-
-    setWaiting(false);
-    if (error) {
-      props.handleAlert(error, "error");
-      navigate("/");
-    } else {
-      props.handleAlert("Voting has started successfully", "success");
-    }
-
-    // Close the modal
-    setShowModal(false);
-    // Reset the time
-    setTime(0);
-    navigate("/vote");
+    setVotingStarted(true); // Set votingStarted to true after startVoting is called
   };
-
   return (
     <>
 

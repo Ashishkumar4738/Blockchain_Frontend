@@ -1,12 +1,13 @@
 import React, { useEffect, useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import blockchainContext from "../context/blockchainContext";
 import { DeleteIcon } from "./Icons";
 import Loader from "./Loader";
 const Candidate = (props) => {
   const context = useContext(blockchainContext);
   const [waiting, setWaiting] = useState(false);
-  const { candidateList, getAllCandidates, deleteCandidate } = context;
+  const { candidateList, getAllCandidates, deleteCandidate,error } = context;
+  const navigate = useNavigate();
 
   useEffect(() => {
     setWaiting(true);
@@ -14,6 +15,13 @@ const Candidate = (props) => {
     setWaiting(false);
     props.handleAlert("Cadidates data fetched from blockchain Successfully","success");
   }, []);
+
+  useEffect(()=>{
+    if(error){
+      props.handleAlert(error,"error");
+      navigate("/");
+    }
+  },[deleteCandidate])
 
     
 
